@@ -878,8 +878,8 @@
                 messageDiv.textContent = '';
 
                 try {
-                    // Prepare template parameters
-                    const templateParams = {
+                    // Prepare template parameters for user
+                    const userTemplateParams = {
                         user_name: formData.get('user_name'),
                         user_email: userEmail,
                         project_type: formData.get('project_type'),
@@ -887,14 +887,31 @@
                         reply_to: userEmail
                     };
 
-                    // Send email
-                    const response = await emailjs.send(
+                    // Prepare template parameters for admin
+                    const adminTemplateParams = {
+                        admin_email: 'tarzenkski@gmail.com',
+                        user_name: formData.get('user_name'),
+                        user_email: userEmail,
+                        project_type: formData.get('project_type'),
+                        message: formData.get('message'),
+                        submission_time: new Date().toLocaleString()
+                    };
+
+                    // Send USER CONFIRMATION EMAIL
+                    const userEmailResponse = await emailjs.send(
                         'service_5st32g8',
-                        'template_c8qsz2g',
-                        templateParams
+                        'template_user_confirmation',  // Create this template in EmailJS
+                        userTemplateParams
                     );
 
-                    if (response.status === 200) {
+                    // Send ADMIN NOTIFICATION EMAIL
+                    const adminEmailResponse = await emailjs.send(
+                        'service_5st32g8',
+                        'template_admin_notification',  // Create this template in EmailJS
+                        adminTemplateParams
+                    );
+
+                    if (userEmailResponse.status === 200 && adminEmailResponse.status === 200) {
                         showMessage('✓ Thank you! Your project inquiry has been sent successfully. We will get back to you within 24 hours.', 'success');
                         form.reset();
                     }
